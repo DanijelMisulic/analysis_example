@@ -1,1 +1,1 @@
-# analysis_example
+# Python project for deciding which city in Australia has "the best" weather
