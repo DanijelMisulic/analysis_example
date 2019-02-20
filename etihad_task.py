@@ -7,28 +7,72 @@ Created on Mon Feb 18 23:30:39 2019
 
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 
-file = pd.ExcelFile('C:/Users/Danijel/Desktop/Meteorological Data.xlsx')
+data = pd.ExcelFile('C:/Users/Danijel/Desktop/Meteorological Data.xlsx')
 
 #get all sheet names
-sheet_names = file.sheet_names
+sheet_names = data.sheet_names
+min_difference = np.inf
+min_index = -1
 
-df1 = pd.read_excel(file, sheet_names[0])
-#print (df1["Maximum temperature (°C)"])
-print ("MAX", np.abs(df1["Maximum temperature (°C)"]))
-#number of rows and columns
-df1.shape
-#I believe this is a difficult question to answer because people will have different definitions of what the best weather is.
-# I do know is that “best” is relative.
-#the warmer the better
+for i in range (0, len(sheet_names)):
+    #load one sheet at a time
+    df1 = pd.read_excel(data, i)
 
-#Interestingly, other weather conditions such as humidity and levels of wind did not appear to 
-#significantly alter the the participants' personality traits.
-#And that's good news for Sydneysiders, because 22 degrees is roughly the average temperature of Sydney in December.
-# Perth is also in luck with an average December temperature hovering around 22 before things really heat up to 25 degrees for the rest of summer.
+    #GETTING TO KNOW THE DATA
 
-#The psychology researchers conclude with a warning: as climate change brings higher average temperatures and greater extremes, our personality traits may gradually shift.
+    #number of rows and columns
+    df1.shape
 
-#There are many cities in the world that have the same weather conditions throughout the year. 
-#Sydney - The city has 340 sunny days a year 
-#Sunshine is delicious, rain is refreshing, wind braces us up, snow is exhilarating; there is really no such thing as bad weather, only different kinds of good weather. John Ruskin
+    df1.dtypes
+
+    #checking if there are still missing values after update of the file
+    df1[df1["Maximum temperature (°C)"].isnull() == True].shape
+    df1[df1["Minimum temperature (°C)"].isnull() == True].shape
+
+    #checking for outliers
+    np.max(df1["Maximum temperature (°C)"])
+    np.min(df1["Maximum temperature (°C)"])
+    np.max(df1["Minimum temperature (°C)"])
+    np.min(df1["Minimum temperature (°C)"])
+    
+    #compute average temperature on a daily basis
+    day_to_day_avg = np.round((df1["Maximum temperature (°C)"] + df1["Minimum temperature (°C)"])/2, 1)
+    
+    if np.abs(np.average(day_to_day_avg) - 22) < min_difference:
+        min_difference = np.abs(np.average(day_to_day_avg) - 22)
+        min_index = i
+    
+    
+    n_groups = 1
+    means_city = (np.average(day_to_day_avg))
+    means_22 = (22)
+     
+    # create plot
+    fig, ax = plt.subplots()
+    index = np.arange(n_groups)
+    bar_width = 0.35
+    opacity = 0.8
+     
+    rects1 = plt.bar(index, means_city, bar_width,
+    alpha=opacity,
+    color='b',
+    label=sheet_names[i].split(" ")[0])
+     
+    rects2 = plt.bar(index + bar_width, means_22, bar_width,
+    alpha=opacity,
+    color='g',
+    label='22 Celsius')
+     
+    plt.ylabel('Average temperature')
+    plt.title('Differences')
+    plt.legend()
+     
+    plt.tight_layout()
+    plt.show()
+
+    
+    
+    
+print ("The city that has the smallest difference to the hapiest average temp of 22 is ",sheet_names[min_index].split(" ")[0], "with average difference of",min_difference)
