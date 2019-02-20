@@ -5,7 +5,7 @@ used packages: pandas, numpy
 
 in order to run program sucessfully, in pip package manager following commands are needed to execute:
 
-pip install pandas \pip install numpy
+pip install pandas <br />pip install numpy
 
 if pip is not installed the first step is to install pip, because it is the easiest way to install required packages
 
